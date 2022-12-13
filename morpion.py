@@ -1,146 +1,132 @@
-from random import *
-
-# fct qui va afficher l'interface du jeu
-def afficher(tab):
-    print("--- Début --\n")
-    for line in tab:
-        for col in line:
-            print(col, end=" | ")
-        print("\n")
-    print("--- Fin ---\n\n")
-
-    
-# fct qui verifie si les croix ont gagnés  
-def verifC(tmp) :
-    if tmp[0][0] == 1 and tmp[0][1] == 1 and tmp[0][2] == 1: # ligne 1
-        return True
-    elif tmp[0][0] == 1 and tmp[1][0] == 1 and tmp[2] [0] == 1: # colonne 1
-        return True
-    elif tmp[1][0] == 1 and tmp[1][1] == 1 and tmp[1] [2] == 1: # ligne 2
-        return True
-    elif tmp[0][1] == 1 and tmp[1][1] == 1 and tmp[2] [1] == 1: # colonne 2
-        return True
-    elif tmp[2][0] == 1 and tmp[2] [1] == 1 and tmp[2] [2]== 1: # ligne 3
-        return True
-    elif tmp[0][2] == 1 and tmp[1] [2] == 1 and tmp[2] [2]== 1: # colonne 3
-        return True
-    elif tmp[0][0] == 1 and tmp[1] [1] == 1 and tmp[2] [2] == 1: # diagonale droite
-        return True
-    elif tmp[0][2] == 0 and tmp[1][1] == 0 and tmp[2][0] == 0 : # diagonale gauche
-        return True
-    else:
-        return False
-
-    
-# fct qui verifie si les ronds ont gagnés
-def verifR(tmp) :
-    if tmp[0][0] == 0 and tmp[0][1]== 0 and tmp[0][2] == 0 : # ligne 1
-        return True
-    elif tmp[0][0] == 0 and tmp[1][0] == 0 and tmp[2] [0] == 0 : # colonne 1
-        return True
-    elif tmp[1][0] == 0 and tmp[1][1] == 0 and tmp[1] [2] == 0: # ligne 2
-        return True
-    elif tmp[0][1] == 0 and tmp[1][1] == 0 and tmp[2] [1] == 0 : # colonne 2
-        return True
-    elif tmp[2][0] == 0 and tmp[2] [1] == 0 and tmp[2] [2] == 0 : # ligne 3
-        return True
-    elif tmp[0][2]== 0 and tmp[1] [2]== 0 and tmp[2] [2] == 0 : # colonne 3
-        return True
-    elif tmp[0][0] == 0 and tmp[1][1] == 0 and tmp[2][2] == 0 : # diagonale droite
-        return True
-    elif tmp[0][2] == 0 and tmp[1][1] == 0 and tmp[2][0] == 0 : # diagonale gauche
-        return True
-    else:
-        return False
-
-# fct qui va determiner si une partie est gagné ou pas 
-def peutJouer(tmp, tab):
-    if verifR(tmp):
-        afficher(tab)
-        print("Les Ronds ont gagnés ! Félicitations ^_^ ")
-        return False
-    if verifC(tmp):
-        afficher(tab)
-        print("Les Croix ont gagnés ! Félicitations ^_^ ")
-        return False
-    # on verifie si le tableau n'est pas déjà remplie
-    else:
-        for line in tmp :
-            for col in line:
-                if col == -1:
-                    return True
-        return False
-
-# fct qui va gerer le tour de la machine pendant une partie
-def ordiJouer(tmp, equipe):
-    # index de ligne
-    i = randint(0,2)
-    #index de colonne
-    j = randint(0,2)
-    # tant que les index tirés aletoirement donne une non libre on tire aleatoirement d'autres index
-    while tmp[i][j] != -1:
-        i = randint(0,2)
-        j = randint(0,2)
-    # on modifie le tableau de jeu
-    if equipe == 'O':
-        tmp[i][j] = 1
-    else:
-        tmp[i][j] = 0
-    return tmp, i, j
+##-----Importation des Modules-----##
+from tkinter import *
 
 
-# fct principale qui va derouler le jeu
-def jouer(tab):
-    
-    motif = ' ' # variable pour l'equipe du joueur
-    ordi = ' ' # variable pour l'equipe de la machine
-    tmp = [[-1 for j in range(3)] for j in range(3)] # initilisation du tableau qui va servir a determiner le denouement du jeu
-    
-    choix = randint(0,1) # choix aléatoire de l'equipe du joueur 0 pour les ronds et 1 pour les croix
-    if choix == 0 :
-        motif = 'O' 
-        ordi = 'X' 
-        print("Vous êtes dans l'équipe des RONDS." ) 
-    else:
-        motif = 'X' 
-        ordi = 'O' 
-        print("Vous êtes dans l'équipe des CROIX." ) 
+##----- Definition des Variables globales -----##
+cases=[ [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]]
+drapeau = True                              # True pour les croix, False pour les ronds
+n = 1                                       # Numero du tour de jeu
 
-    # tant qu'on peut jouer on demandera au joueur les index
-    while peutJouer(tmp,tab) :
-        
-        afficher(tab) # affichage de l'interface
-        
-        i = int(input("Saisie le numéro de ligne (entre 1 et 3) : "))  # on demande au joueur l'index de ligne
-        j = int(input("Saisie le numéro de colonne (entre 1 et 3) : ")) # on demande au joueur l'index de colonne
-        
-        if (1 <= i and i <= 3) and (1 <= j and j <= 3) : # verifie si les index de lignes et colonnes saisie sont juste
-            if tmp[i-1][j-1] == - 1: # verifie si la case donnée est libre, si c'est le cas on met à jour l'interface du jeu
-                tmp[i-1][j-1] = choix
-                tab[i-1][j-1]= motif
-                if peutJouer(tmp,tab): # si le joueur n'a pas gagné la machine peut jouer à son tour
-                    tmp, i2, j2 = ordiJouer(tmp, motif) 
-                    tab[i2][j2] = ordi
-            else :
-                print("Vous avez choisie une case non libre. Choissisez une case avec un point (libre) !")
-        else :
-         print("Votre numéro de ligne et colonne doit être compris entre 1 et 3 !")
-         
-    if peutJouer(tmp,tab):
-        afficher(tab)
-        print("Fin de partie ! ")
-    
-   
 
-# main
-run = 1
-while run:
-    
-    tab = [['.' for j in range(3)]for i in range(3)] # interface de jeu
-    jouer(tab) # lancement d'une partie
-    run = int(input("Vous voulez rejouer une nouvelle partie ? ( 1 pour oui ou 0 pour non) : "))
-    if run == 0:
-        break
-    while run != 1 and run != 0:
-        run = int(input("Saisisez 1 pour oui ou 0 pour non : "))
-    
+##----- Definition des Fonctions -----##
+def afficher(event) :
+    """ Entrees : Un evenement de la souris
+        Sortie : Affiche en temps reel les coordonnees de la case du clic de souris"""
+    global drapeau, cases, n
+    l = (event.y-2)//100                    # Ligne du clic
+    c = (event.x-2)//100                    # Colonne du clic
+
+    if (n < 10) and (cases[l][c] == 0):
+        if drapeau:                              # drapeau == True
+            dessin.create_line(100*c+8, 100*l+8, 100*c+96, 100*l+96, width = 5, fill = 'blue')
+            dessin.create_line(100*c+8, 100*l+96, 100*c+96, 100*l+8, width = 5, fill = 'blue')
+            cases[l][c] = 1
+            message.configure(text='Aux ronds de jouer')
+
+        else:
+            dessin.create_oval(100*c+8, 100*l+8, 100*c+96, 100*l+96, width = 5, outline = 'red')
+            cases[l][c] = -1
+            message.configure(text='Aux croix de jouer')
+
+        drapeau = not(drapeau)
+        if (n >= 5) and (n <= 9):
+            somme = verif(cases)
+            if somme == 1 or somme == -1:
+                n = gagner(somme)
+            elif n == 9:
+                n = gagner(0)
+        n += 1
+
+
+def verif(tableau):
+    """ Entrees : un tableau "carre"
+        Sorties : Calcule les sommes de chaque ligne/colonne/diagonale
+            et verifie l'alignement."""
+    sommes = [0,0,0,0,0,0,0,0]             # Il y a 8 sommes a verifier
+    # Les lignes :
+    sommes[0] = sum(tableau[0])
+    sommes[1] = sum(tableau[1])
+    sommes[2] = sum(tableau[2])
+    # Les colonnes
+    sommes[3] = tableau[0][0]+tableau[1][0]+tableau[2][0]
+    sommes[4] = tableau[0][1]+tableau[1][1]+tableau[2][1]
+    sommes[5] = tableau[0][2]+tableau[1][2]+tableau[2][2]
+    # Les diagonales
+    sommes[6] = tableau[0][0]+tableau[1][1]+tableau[2][2]
+    sommes[7] = tableau[0][2]+tableau[1][1]+tableau[2][0]
+
+    for i in range(8):                     # Parcours des sommes
+        if sommes[i] == 3:
+            return 1
+        elif sommes[i] == -3:
+            return -1
+    return 0
+
+
+
+def gagner(a):
+    """Cette fonction indique le gagnant en modifiant le message et en
+        renvoyant la valeur 9."""
+    if a == 1:
+        message.configure(text = 'Les croix ont gagne !')
+    elif a == -1:
+        message.configure(text = 'Les ronds ont gagne !')
+    elif a == 0:
+        message.configure(text = 'Match nul !')
+    return 9
+
+
+
+def reinit():
+    """Cette fonction re-initialise les variables globales."""
+    global drapeau, cases, n
+    cases = [[0, 0, 0],
+             [0, 0, 0],
+             [0, 0, 0]]
+    drapeau = True          # True pour les croix, False pour les ronds
+    n = 1
+
+    message.configure(text='Aux croix de jouer')
+    dessin.delete(ALL)      # Efface toutes les figures
+    lignes = []
+    for i in range(4):
+      lignes.append(dessin.create_line(0, 100*i+2, 303, 100*i+2, width=3))
+      lignes.append(dessin.create_line(100*i+2, 0, 100*i+2, 303, width=3))
+
+
+##-----Creation de la fenetre-----##
+fen = Tk()
+fen.title('Morpion')
+
+
+##-----Creation des zones de texte-----##
+message=Label(fen, text='Aux croix de jouer')
+message.grid(row = 0, column = 0, columnspan=2, padx=3, pady=3, sticky = W+E)
+
+
+##-----Creation des boutons-----##
+bouton_quitter = Button(fen, text='Quitter', command=fen.destroy)
+bouton_quitter.grid(row = 2, column = 1, padx=3, pady=3, sticky = S+W+E)
+
+bouton_reload = Button(fen, text='Recommencer', command=reinit)
+bouton_reload.grid(row = 2, column = 0, padx=3, pady=3, sticky = S+W+E)
+
+
+##-----Creation du canevas-----##
+dessin=Canvas(fen, bg="white", width=301, height=301)
+dessin.grid(row = 1, column = 0, columnspan = 2, padx=5, pady=5)
+
+
+##-----La grille-----##
+lignes = []
+
+
+##-----Evenements-----##
+dessin.bind('<Button-1>', afficher)
+
+
+##-----Programme principal-----##
+reinit()
+fen.mainloop()                      # Boucle d'attente des evenements
